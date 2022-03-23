@@ -1,4 +1,5 @@
 const Hapi = require('@Hapi/hapi');
+const routes = require("./routes");
 
 const server = Hapi.server({
   port: 8080,
@@ -8,7 +9,7 @@ const server = Hapi.server({
 
 const startServer = async () => {
   try {
-    // await server.register(routes);
+    await server.register(routes);
     await server.start();
     console.log(`Server running on: ${server.info.uri}`);
   } catch (error) {
