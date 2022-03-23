@@ -1,6 +1,8 @@
 const Hapi = require('@Hapi/hapi');
 const routes = require("./routes");
 
+require('./database');
+
 const server = Hapi.server({
   port: 8080,
   host: 'localhost',
