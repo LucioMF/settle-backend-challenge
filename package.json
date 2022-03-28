@@ -12,7 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^20.2.1",
+    "@hapi/inert": "^6.0.5",
+    "@hapi/vision": "^6.1.0",
+    "axios": "^0.26.1",
     "express": "^4.17.3",
+    "hapi-swagger": "^14.2.5",
     "mongoose": "^6.2.7"
   },
   "devDependencies": {

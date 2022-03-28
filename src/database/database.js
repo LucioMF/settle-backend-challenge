@@ -1,8 +1,9 @@
-const mongoose = requiree('mongoose');
+const mongoose = require('mongoose');
 
-mongoose.connect('monodb://localhost:3001/settle_challenge', {
+mongoose.connect('mongodb://root:password@localhost:27017/settle_challenge', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    authSource: 'admin'
 })
 .then(() => console.log('Database connection established'))
 .catch((e) => console.error(`Database connection error: ${e}`));
