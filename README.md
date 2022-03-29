@@ -1,7 +1,7 @@
 [![Hapi.JS](https://img.shields.io/npm/v/hapi.svg?label=hapi&style=flat-square)](https://hapijs.com)
 [![Mongoose](https://img.shields.io/npm/v/mongoose.svg?label=mongoose&style=flat-square)](http://mongoosejs.com/)
 
-> ### Hapi.JS Server for Rates API (Hapi.JS + Mongoose) [Settle Challenge](https://https://github.com/LucioMF/settle-backend-challenge).
+> ### Hapi.JS Server for Rates API (Hapi.JS + Mongoose) [Settle Challenge](https://github.com/LucioMF/settle-backend-challenge).
 
 # Getting started
 
