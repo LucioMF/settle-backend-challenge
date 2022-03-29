@@ -1,8 +1,10 @@
-const Hapi = require('@Hapi/hapi');
+const Hapi = require('@hapi/hapi');
 const routes = require("./routes");
 const Inert = require('@hapi/inert');
 const Vision = require('@hapi/vision');
 const HapiSwagger = require('hapi-swagger');
+
+require('dotenv').config();
 
 require('./database/database');
 

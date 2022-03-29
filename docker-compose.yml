@@ -1,23 +1,24 @@
 version: "3"
 
 services:
-  # hapi-server:
-  #   container_name: hapi-server
-  #   restart: always
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   # env_file: .env
-  #   ports:
-  #     - "4500:4500"
-  #   links:
-  #     - mongodb
-  #   depends_on:
-  #     - mongodb
-  #   environment:
-  #     WAIT_HOSTS: mongodb:27017
-  #   networks:
-  #     - backend-challenge-network
+  hapi-server:
+    container_name: hapi-server
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "8080:8080"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    environment:
+      WAIT_HOSTS: mongodb:27017
+      DB_HOST: mongodb
+    networks:
+      - backend-challenge-network
 
   mongodb:
     container_name: mongodb

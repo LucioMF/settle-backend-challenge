@@ -1,10 +1,9 @@
-FROM alpine:3.4
+FROM node:alpine
 
-RUN apk update && apk upgrade
-RUN apk add nodejs
-RUN rm -rf /var/cache/apk/*
+COPY ./package*.json ./
 
-COPY . /src
-RUN cd /src; npm install
-EXPOSE 8080
-CMD ["node", "/src/app.js"]
+RUN npm install
+
+COPY ./ ./
+
+CMD [ "npm","run","start" ]
