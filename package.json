@@ -18,6 +18,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "hapi-swagger": "^14.2.5",
+    "joi": "^17.6.0",
     "mongoose": "^6.2.7"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 const Rate = require('../../database/models/rate');
 const axios = require('axios');
+const Joi = require('joi');
 
 module.exports = {
     name: 'Rates',
@@ -19,7 +20,7 @@ module.exports = {
             },
             description: 'Get rates',
             notes: 'Return all rates',
-            tags: ['Rates API'],
+            tags: ['api'],
           }
         },
         {
@@ -82,7 +83,14 @@ module.exports = {
           },
             description: 'Create Rate',
             notes: 'Create one rate',
-            tags: ['Rates API'],
+            tags: ['api'],
+            validate: {
+              payload: Joi.object({
+                pair: Joi.string().required(),
+                originalRate: Joi.number().required(),
+                fee: Joi.number(),
+              })
+            },
           }
         },
         {
@@ -116,7 +124,14 @@ module.exports = {
           },
             description: 'Add Fee',
             notes: 'Add a mark-up fee over one rate',
-            tags: ['Rates API'],
+            tags: ['api'],
+            validate: {
+              payload: Joi.object({
+                pair: Joi.string().required(),
+                originalRate: Joi.number().required(),
+                fee: Joi.number().required(),
+              })
+            },
           }
         },
       ]);
