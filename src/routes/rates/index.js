@@ -39,12 +39,12 @@ module.exports = {
                 let rateWithFee;
 
                 await axios.get(`${baseUrl}/latest?access_key=${accessKey}&base=${base}&symbols=${symbol}`)
-                          .then((response) => {
-                            apiResponse = response.data;
-                          })
-                          .catch((error) => {
-                            console.error(error);
-                          });
+                  .then((response) => {
+                    apiResponse = response.data;
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
 
                 if(!apiResponse.success) {
                   await axios.get(`${baseUrl}/latest?access_key=${accessKey}&base=EUR&symbols=${base},${symbol}`)
