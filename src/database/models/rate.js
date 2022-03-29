@@ -6,5 +6,14 @@ var RateSchema = new Schema({
     fee: Number,
     feeAmount: Number,
     rateWithFee: Number,
+    apiResponseRate: Number,
+    createdAt: {
+        type: Date,
+        required: false,
+    },
+    updatedAt: {
+        type: Date,
+        required: false,
+    },
 });
 module.exports = mongoose.model('Rate', RateSchema);

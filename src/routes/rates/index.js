@@ -10,11 +10,11 @@ module.exports = {
           path: '/rates',
           options: {
             handler: async (req, res) => {
-              Rate.find(function(error, rates) {
-                if (error) {
-                    console.error(error);
-                }
-                reply(rates);
+              return new Promise( async (rslv, rjct) => {
+                await Rate.find((error, rates) => {
+                  if (error) console.error(error);
+                  rslv(rates);
+                }).clone().catch(err => { console.error(error); });
               });
             },
             description: 'Get rates',
@@ -28,34 +28,71 @@ module.exports = {
           options: {
             handler: (request, reply) => {
               return new Promise( async (rslv, rjct) => {
-                baseUrl = 'https://data.fixer.io/api';
-                accessKey = '824e753b9d8f1bf170e5adf80e7788e9';
-                await axios.get(`${baseUrl}/convert` +
-                            `?access_key=${accessKey}` +
-                            `&from=${request.payload.pair.substring(0,2)}` +
-                            `&to=${request.payload.pair.substring(3,5)}` +
-                            `&amount=${request.payload.originalRate}`)
+                const baseUrl = 'http://data.fixer.io/api';
+                const accessKey = '824e753b9d8f1bf170e5adf80e7788e9';
+                const originalRate = parseInt(request.payload.originalRate);
+                const base = request.payload.pair.toUpperCase().substring(0,3);
+                const symbol = request.payload.pair.toUpperCase().substring(3,6);
+                let responseRate;
+                await axios.get(`${baseUrl}/latest?access_key=${accessKey}&base=${base}&symbols=${symbol}`)
                           .then((response) => {
-                            return rslv(response);
+                            responseRate = response.data.rates[symbol];
                           })
                           .catch((error) => {
-                            return rjct(error);
+                            console.error(error);
                           });
-                // const rate = new Rate({
-                //     pair: request.payload.pair,
-                //     originalRate: request.payload.originalRate,
-                //     fee: request.payload.fee,
-                //     feeAmount: request.payload.feeAmount,
-                //     rateWithFee: request.payload.rateWithFee,
-                // });
-                // await rate.save(function(error, rate) {
-                //   if (error) rjct(error);
-                //   rslv(rate.id);
-                // });
+                const feeAmount = request.payload.fee ? request.payload.fee / 100 * (originalRate*responseRate) : 0;
+                const rate = new Rate({
+                    pair: request.payload.pair.toUpperCase(),
+                    originalRate: originalRate,
+                    fee: request.payload.fee ? request.payload.fee : 0,
+                    feeAmount,
+                    rateWithFee: (originalRate*responseRate) + feeAmount,
+                    apiResponseRate: responseRate,
+                    createdAt: new Date(),
+                });
+                await rate.save((error, rate) => {
+                  if (error) console.error(error);
+                  rslv(rate.id);
+                });
               });
           },
-            description: 'Get rates',
-            notes: 'Return all rates',
+            description: 'Create Rate',
+            notes: 'Create one rate',
+            tags: ['Rates API'],
+          }
+        },
+        {
+          method: 'POST',
+          path: '/rates',
+          options: {
+            handler: (request, reply) => {
+              return new Promise( async (rslv, rjct) => {
+                const ratesFound = await Rate.aggregate(
+                  [
+                    {$match: {pair: request.payload.pair.toUpperCase()}},
+                    {$match:{ originalRate: request.payload.originalRate}},
+                  ])
+                  .sort({createdAt: 'desc'});
+                const rate = ratesFound[0];
+                if (!rate) { 
+                  return rjct(new Error("Couldn't find Rate"));
+                }
+                const feeAmount = request.payload.fee / 100 * (rate.originalRate*rate.apiResponseRate);
+                rate.fee = request.payload.fee;
+                rate.feeAmount = feeAmount;
+                rate.rateWithFee = (rate.originalRate*rate.apiResponseRate) + feeAmount;
+                rate.updatedAt = new Date();
+                await Rate.findByIdAndUpdate(rate._id, rate, {new: true}, (err, doc) => {
+                  if (err) {
+                    console.error(err);
+                  }
+                  rslv(doc);
+                }).clone().catch(err => { console.error(err); });
+              });
+          },
+            description: 'Add Fee',
+            notes: 'Add a mark-up fee over one rate',
             tags: ['Rates API'],
           }
         },
