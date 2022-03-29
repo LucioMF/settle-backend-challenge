@@ -33,21 +33,44 @@ module.exports = {
                 const originalRate = parseInt(request.payload.originalRate);
                 const base = request.payload.pair.toUpperCase().substring(0,3);
                 const symbol = request.payload.pair.toUpperCase().substring(3,6);
+                let apiResponse;
+                let feeAmount;
                 let responseRate;
+                let rateWithFee;
+
                 await axios.get(`${baseUrl}/latest?access_key=${accessKey}&base=${base}&symbols=${symbol}`)
                           .then((response) => {
-                            responseRate = response.data.rates[symbol];
+                            apiResponse = response.data;
                           })
                           .catch((error) => {
                             console.error(error);
                           });
-                const feeAmount = request.payload.fee ? request.payload.fee / 100 * (originalRate*responseRate) : 0;
+
+                if(!apiResponse.success) {
+                  await axios.get(`${baseUrl}/latest?access_key=${accessKey}&base=EUR&symbols=${base},${symbol}`)
+                  .then((response) => {
+                    const EUR_to_base = response.data.rates[base];
+                    const EUR_to_symbol = response.data.rates[symbol];
+                    const BASE_to_EUR = 1/EUR_to_base;
+                    responseRate = ((originalRate*BASE_to_EUR)*EUR_to_symbol) / originalRate;
+                    feeAmount = request.payload.fee ? request.payload.fee / 100 * ((originalRate*BASE_to_EUR)*EUR_to_symbol) : 0;
+                    rateWithFee = ((originalRate*BASE_to_EUR)*EUR_to_symbol) + feeAmount;
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
+                } else {
+                  responseRate = apiResponse.rates[symbol];
+                  feeAmount = request.payload.fee ? request.payload.fee / 100 * (originalRate*responseRate) : 0;
+                  rateWithFee = (originalRate*responseRate) + feeAmount;
+                }
+
                 const rate = new Rate({
                     pair: request.payload.pair.toUpperCase(),
                     originalRate: originalRate,
                     fee: request.payload.fee ? request.payload.fee : 0,
                     feeAmount,
-                    rateWithFee: (originalRate*responseRate) + feeAmount,
+                    rateWithFee,
                     apiResponseRate: responseRate,
                     createdAt: new Date(),
                 });
