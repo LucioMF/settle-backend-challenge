@@ -9,8 +9,8 @@ require('dotenv').config();
 require('./database/database');
 
 const server = Hapi.server({
-  port: 8080,
-  host: 'localhost',
+  port: process.env.PORT,
+  host: process.env.HOST,
   app: {}
 });
 

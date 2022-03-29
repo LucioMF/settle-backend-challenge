@@ -3,38 +3,30 @@ version: "3"
 services:
   hapi-server:
     container_name: hapi-server
-    restart: always
+    restart: on-failure
     build:
       context: .
       dockerfile: Dockerfile
     env_file: .env
     ports:
-      - "3001:8080"
-    links:
-      - mongodb
-    depends_on:
-      - mongodb
+      - "8080:8080"
     environment:
       WAIT_HOSTS: mongodb:27017
       DB_HOST: mongodb
-    networks:
-      - backend-challenge-network
+      HOST: "0.0.0.0"
+      PORT: "8080"
 
   mongodb:
     container_name: mongodb
     restart: always
     image: mongo:4.4.6
     volumes:
-      - ~/mongo:/data/db
+      - mongo:/data/db
     ports:
       - "27017:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGO_INITDB_DATABASE=admin
-    networks:
-      - backend-challenge-network
-
-networks:
-  backend-challenge-network:
-    driver: bridge
+volumes:
+  mongo:
